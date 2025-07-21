@@ -37,7 +37,8 @@ body {
     align-items: center;
 }
 
-.ant-upload {
+.ant-upload,
+.ant-input-number {
     width: 100% !important;
 }
 

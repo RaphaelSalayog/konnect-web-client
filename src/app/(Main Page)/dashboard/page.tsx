@@ -1,9 +1,7 @@
-"use client";
+import Dashboard from "@/pages/Dashboard";
 
-import TitlePage from "@/components/TitlePage";
-
-const Dashboard = () => {
-    return <TitlePage title="Dashboard">qwe</TitlePage>;
+const Page = () => {
+    return <Dashboard />;
 };
 
-export default Dashboard;
+export default Page;

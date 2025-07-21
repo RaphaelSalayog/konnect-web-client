@@ -1,9 +1,7 @@
-"use client";
+import Order from "@/pages/Order";
 
-import TitlePage from "@/components/TitlePage";
-
-const Order = () => {
-    return <TitlePage title="Order">qweqwe</TitlePage>;
+const Page = () => {
+    return <Order />;
 };
 
-export default Order;
+export default Page;

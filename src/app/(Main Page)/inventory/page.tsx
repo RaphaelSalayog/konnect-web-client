@@ -1,9 +1,7 @@
-"use client";
+import Inventory from "@/pages/Inventory";
 
-import TitlePage from "@/components/TitlePage";
-
-const Inventory = () => {
-    return <TitlePage title="Inventory">qweqwe</TitlePage>;
+const Page = () => {
+    return <Inventory />;
 };
 
-export default Inventory;
+export default Page;

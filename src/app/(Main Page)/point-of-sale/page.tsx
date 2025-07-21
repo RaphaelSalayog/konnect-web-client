@@ -1,9 +1,7 @@
-"use client";
+import PointOfSale from "@/pages/Point-of-Sale";
 
-import TitlePage from "@/components/TitlePage";
-
-const PointOfSale = () => {
-    return <TitlePage title="Point of Sale">qweqwe</TitlePage>;
+const Page = () => {
+    return <PointOfSale />;
 };
 
-export default PointOfSale;
+export default Page;
