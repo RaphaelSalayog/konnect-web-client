@@ -10,7 +10,7 @@ const PointOfSale = () => {
             <div className="flex flex-col min-h-[80vh]">
                 <div className="w-[75%]">
                     <div className="grid grid-cols-3 gap-4">
-                        {[...Array(3)].map((_, i) => (
+                        {[...Array(5)].map((_, i) => (
                             <div
                                 key={i}
                                 className="h-50 shadow-md border border-gray-100 rounded-lg p-4!"
@@ -31,10 +31,13 @@ const PointOfSale = () => {
                                                 P 1,000.00
                                             </div>
                                         </div>
-                                        <div className="grow">
+                                        <div className="grow multi-line-truncate">
                                             Description Description Description Description
                                             Description Description Description Description
-                                            Description Description Description
+                                            Description Description Description Description
+                                            Description Description Description Description
+                                            Description Description Description Description
+                                            Description Description
                                         </div>
                                         <div>Stocks : 80</div>
                                     </div>
