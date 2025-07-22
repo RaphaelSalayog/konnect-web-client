@@ -6,7 +6,7 @@ import { Button, Layout, Menu, theme } from "antd";
 import { Footer } from "antd/es/layout/layout";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const { Header, Sider, Content } = Layout;
 
@@ -32,6 +32,12 @@ export default function RootLayout({
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+
+    useEffect(() => {
+        if (pathname) {
+            window.scrollTo(0, 0);
+        }
+    }, [pathname]);
 
     return (
         <Layout className="!min-h-screen">
@@ -92,7 +98,6 @@ export default function RootLayout({
                     style={{
                         margin: "24px 16px",
                         padding: 24,
-                        minHeight: 280,
                         background: colorBgContainer,
                         borderRadius: borderRadiusLG,
                     }}

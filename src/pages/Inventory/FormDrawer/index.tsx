@@ -229,7 +229,7 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
                         <Form.Item label="Photo (optional)" name="photo">
                             <Upload
                                 listType="picture"
-                                defaultFileList={fileList}
+                                // defaultFileList={fileList}
                                 beforeUpload={() => false}
                                 onChange={handleChange}
                                 maxCount={1}

@@ -4,10 +4,12 @@ import CustomActionButtons from "@/components/CustomActionButtons";
 import TitlePage from "@/components/TitlePage";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Table, TableProps } from "antd";
+import { Button, Input, Table, TableProps } from "antd";
 import Image from "next/image";
 import { useContext } from "react";
 import EmployeeFormDrawer from "./FormDrawer";
+
+const { Search } = Input;
 
 interface DataType {
     key: string;
@@ -169,10 +171,11 @@ const Inventory = () => {
         <>
             <TitlePage title="Inventory">
                 <div className="!space-y-6">
-                    <div className="flex !justify-end">
+                    <div className="flex !justify-end gap-4">
+                        <Search placeholder="Name" className="w-100!" allowClear enterButton />
                         <Button
                             type="primary"
-                            size="large"
+                            size="middle"
                             icon={<PlusOutlined />}
                             onClick={() => {
                                 add.setVisible(true);
