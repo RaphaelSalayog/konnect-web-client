@@ -64,7 +64,8 @@ const data: DataType[] = [
         key: "5",
         photo: { url: "https://images.unsplash.com/photo-1589301913259-d47db05c1d5a" },
         name: "Kimchi Ramen Bowl",
-        description: "Instant noodles with dehydrated kimchi",
+        description:
+            "Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi",
         quantity: 120,
         unit_cost: 0.95,
         price: 2.25,
@@ -104,6 +105,17 @@ const Inventory = () => {
             title: "Description",
             dataIndex: "description",
             key: "description",
+            onCell: () => ({
+                style: {
+                    maxWidth: 200,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                },
+            }),
+            render: (description) => {
+                return <p className="multi-line-truncate">{description}</p>;
+            },
         },
         {
             title: "Quantity",

@@ -3,7 +3,6 @@
 import { routes } from "@/constants/routes";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
-import { Footer } from "antd/es/layout/layout";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -105,7 +104,7 @@ export default function RootLayout({
                 >
                     {children}
                 </Content>
-                <Footer style={{ textAlign: "center" }}>PhilCentro Technologies Inc.</Footer>
+                {/* <Footer style={{ textAlign: "center" }}>PhilCentro Technologies Inc.</Footer> */}
             </Layout>
         </Layout>
     );

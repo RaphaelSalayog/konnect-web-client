@@ -3,7 +3,7 @@
 // import { createEmployee, getEmployeeById, updateEmployee } from "@/api/employee";
 // import { STORAGE_NAME } from "@/constants/constants";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
-import { SaveOutlined, UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, SaveOutlined, UploadOutlined } from "@ant-design/icons";
 // import { createClient } from "@supabase/supabase-js";
 import {
     Button,
@@ -146,10 +146,18 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
                             <Button
                                 onClick={onClickSubmit}
                                 type="primary"
-                                icon={<SaveOutlined />}
+                                icon={
+                                    add.visible ? (
+                                        <PlusOutlined />
+                                    ) : edit.visible ? (
+                                        <SaveOutlined />
+                                    ) : (
+                                        ""
+                                    )
+                                }
                                 loading={isSubmitting}
                             >
-                                {add.visible ? "Submit" : edit.visible ? "Save" : ""}
+                                {add.visible ? "Add" : edit.visible ? "Save" : ""}
                             </Button>
                         )}
                     </Space>
