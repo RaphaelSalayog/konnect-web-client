@@ -3,8 +3,8 @@
 import CustomActionButtons from "@/components/CustomActionButtons";
 import TitlePage from "@/components/TitlePage";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
-import { PlusOutlined } from "@ant-design/icons";
-import { Button, Input, Table, TableProps } from "antd";
+import { CheckCircleFilled, PlusOutlined } from "@ant-design/icons";
+import { Button, Input, message, Modal, Table, TableProps } from "antd";
 import Image from "next/image";
 import { useContext } from "react";
 import EmployeeFormDrawer from "./FormDrawer";
@@ -73,6 +73,8 @@ const data: DataType[] = [
 ];
 
 const Inventory = () => {
+    const [modal, contextHolderModal] = Modal.useModal();
+    const [messageApi, contextHolderMessage] = message.useMessage();
     const { add, edit, view, id } = useContext(DrawerContext);
 
     const columns: TableProps<DataType>["columns"] = [
@@ -148,31 +150,24 @@ const Inventory = () => {
                         // id.setValue(record.id);
                     }}
                     handleDelete={() => {
-                        // modal.confirm({
-                        //     title: "Confirm Discard",
-                        //     content: (
-                        //         <>
-                        //             <p>
-                        //                 Are you sure you want to delete{" "}
-                        //                 <span className="font-semibold">{record.username}</span>?
-                        //             </p>
-                        //             <p>This action cannot be undone.</p>
-                        //         </>
-                        //     ),
-                        //     onOk: async () => {
-                        //         try {
-                        //             const resp = await deleteEmployee({ id: record.id });
-                        //             if (resp.status === 200) {
-                        //                 setReload((prev) => !prev);
-                        //                 messageApi.open({
-                        //                     type: "success",
-                        //                     content: "Employee delete successfully!",
-                        //                 });
-                        //             }
-                        //         } catch (error) {}
-                        //     },
-                        //     okText: "YES",
-                        // });
+                        modal.confirm({
+                            title: "Confirm Deletion",
+                            content: (
+                                <>
+                                    <p>Are you sure you want to delete this item?</p>
+                                    <p>This action cannot be undone.</p>
+                                </>
+                            ),
+                            onOk: () => {
+                                messageApi.open({
+                                    type: "success",
+                                    icon: <CheckCircleFilled className="!text-red-500" />,
+                                    content: "Item was deleted successfully!",
+                                });
+                            },
+                            okText: "DELETE",
+                            okType: "danger",
+                        });
                     }}
                 />
             ),
@@ -181,6 +176,8 @@ const Inventory = () => {
 
     return (
         <>
+            {contextHolderModal}
+            {contextHolderMessage}
             <TitlePage title="Inventory">
                 <div className="!space-y-6">
                     <div className="flex !justify-end gap-4">
