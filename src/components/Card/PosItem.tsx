@@ -1,7 +1,7 @@
 import { Button, Card, InputNumber, Tag, Tooltip } from "antd";
 import Image from "next/image";
 
-interface IItemCard {
+interface IPosItemCard {
     url: string;
     title: string;
     description: string;
@@ -10,7 +10,7 @@ interface IItemCard {
     price: number;
 }
 
-const ItemCard = ({ url, title, description, category, stocks, price }: IItemCard) => {
+const PosItemCard = ({ url, title, description, category, stocks, price }: IPosItemCard) => {
     return (
         <Card style={{ height: "auto" }}>
             <div className="grid [grid-template-columns:1fr_2fr] [grid-template-rows:3fr_auto] gap-2">
@@ -45,4 +45,4 @@ const ItemCard = ({ url, title, description, category, stocks, price }: IItemCar
     );
 };
 
-export default ItemCard;
+export default PosItemCard;

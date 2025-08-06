@@ -1,4 +1,4 @@
-import CheckoutItemCard from "@/components/CheckoutItemCard";
+import CheckoutItemCard from "@/components/Card/CheckoutItem";
 import { Button } from "antd";
 
 const items = [

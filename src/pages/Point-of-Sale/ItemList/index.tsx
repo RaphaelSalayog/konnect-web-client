@@ -1,4 +1,4 @@
-import ItemCard from "@/components/ItemCard";
+import PosItemCard from "@/components/Card/PosItem";
 import { Input, Pagination } from "antd";
 
 const { Search } = Input;
@@ -58,7 +58,7 @@ const ItemList = () => {
                 <ul className="grid grid-cols-3 gap-4">
                     {items.map((item, i) => (
                         <li key={i}>
-                            <ItemCard {...item} />
+                            <PosItemCard {...item} />
                         </li>
                     ))}
                 </ul>
