@@ -4,7 +4,7 @@ import CustomActionButtons from "@/components/CustomActionButtons";
 import TitlePage from "@/components/TitlePage";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
 import { CheckCircleFilled, PlusOutlined } from "@ant-design/icons";
-import { Button, Input, message, Modal, Table, TableProps } from "antd";
+import { Button, Input, message, Modal, Table, TableProps, Tag, Tooltip } from "antd";
 import Image from "next/image";
 import { useContext } from "react";
 import EmployeeFormDrawer from "./FormDrawer";
@@ -21,6 +21,7 @@ interface DataType {
     quantity: number;
     unit_cost: number;
     price: number;
+    category: string;
 }
 
 const data: DataType[] = [
@@ -32,6 +33,7 @@ const data: DataType[] = [
         quantity: 25,
         unit_cost: 2.5,
         price: 4.99,
+        category: "Electronics",
     },
     {
         key: "2",
@@ -41,6 +43,7 @@ const data: DataType[] = [
         quantity: 18,
         unit_cost: 2.1,
         price: 4.49,
+        category: "Electronics",
     },
     {
         key: "3",
@@ -50,6 +53,7 @@ const data: DataType[] = [
         quantity: 60,
         unit_cost: 1.2,
         price: 2.99,
+        category: "Electronics",
     },
     {
         key: "4",
@@ -59,6 +63,7 @@ const data: DataType[] = [
         quantity: 40,
         unit_cost: 3.8,
         price: 7.49,
+        category: "Electronics",
     },
     {
         key: "5",
@@ -69,6 +74,7 @@ const data: DataType[] = [
         quantity: 120,
         unit_cost: 0.95,
         price: 2.25,
+        category: "Electronics",
     },
 ];
 
@@ -102,6 +108,21 @@ const Inventory = () => {
             title: "Name",
             dataIndex: "name",
             key: "name",
+            onCell: () => ({
+                style: {
+                    maxWidth: 200,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                },
+            }),
+            render: (name) => {
+                return (
+                    <Tooltip placement="topLeft" title={name}>
+                        <p className="multi-line-truncate line-clamp-1">{name}</p>
+                    </Tooltip>
+                );
+            },
         },
         {
             title: "Description",
@@ -116,7 +137,23 @@ const Inventory = () => {
                 },
             }),
             render: (description) => {
-                return <p className="multi-line-truncate">{description}</p>;
+                return (
+                    <Tooltip placement="topLeft" title={description}>
+                        <p className="multi-line-truncate line-clamp-1">{description}</p>
+                    </Tooltip>
+                );
+            },
+        },
+        {
+            title: "Category",
+            dataIndex: "category",
+            key: "category",
+            render: (category) => {
+                return (
+                    <span>
+                        <Tag color="blue">{category}</Tag>
+                    </span>
+                );
             },
         },
         {

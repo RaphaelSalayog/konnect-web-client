@@ -170,87 +170,82 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
                 loading={isLoading}
             >
                 <Form form={form} layout="vertical" onFinish={onFinish} autoComplete="off">
-                    <div className="!space-y-6">
-                        <Form.Item
-                            label="Name"
-                            name="name"
-                            rules={[{ required: true, message: "Name is required" }]}
-                        >
-                            <Input allowClear readOnly={view.visible} />
-                        </Form.Item>
+                    <Form.Item
+                        label="Name"
+                        name="name"
+                        rules={[{ required: true, message: "Name is required" }]}
+                    >
+                        <Input allowClear readOnly={view.visible} />
+                    </Form.Item>
 
+                    <Form.Item
+                        label="Description"
+                        name="description"
+                        rules={[{ required: true, message: "Description is required" }]}
+                    >
+                        <TextArea autoSize={{ minRows: 3, maxRows: 5 }} readOnly={view.visible} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Quantity"
+                        name="quantity"
+                        rules={[{ required: true, message: "Quantity is required" }]}
+                    >
+                        <Input allowClear readOnly={view.visible} />
+                    </Form.Item>
+
+                    <div className="grid grid-cols-2 gap-x-5.5">
                         <Form.Item
-                            label="Description"
-                            name="description"
-                            rules={[{ required: true, message: "Description is required" }]}
+                            label="Unit Cost"
+                            name="unit_cost"
+                            rules={[{ required: true, message: "Unit Cost is required" }]}
                         >
-                            <TextArea
-                                autoSize={{ minRows: 3, maxRows: 5 }}
+                            <InputNumber<number>
+                                precision={2}
+                                formatter={(value) =>
+                                    `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                }
+                                parser={(value) =>
+                                    value?.replace(/₱\s?|(,*)/g, "") as unknown as number
+                                }
                                 readOnly={view.visible}
                             />
                         </Form.Item>
 
                         <Form.Item
-                            label="Quantity"
-                            name="quantity"
-                            rules={[{ required: true, message: "Quantity is required" }]}
+                            label="Price"
+                            name="price"
+                            rules={[{ required: true, message: "Price is required" }]}
                         >
-                            <Input allowClear readOnly={view.visible} />
-                        </Form.Item>
-
-                        <div className="grid grid-cols-2 gap-x-5.5">
-                            <Form.Item
-                                label="Unit Cost"
-                                name="unit_cost"
-                                rules={[{ required: true, message: "Unit Cost is required" }]}
-                            >
-                                <InputNumber<number>
-                                    precision={2}
-                                    formatter={(value) =>
-                                        `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                    }
-                                    parser={(value) =>
-                                        value?.replace(/₱\s?|(,*)/g, "") as unknown as number
-                                    }
-                                    readOnly={view.visible}
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                label="Price"
-                                name="price"
-                                rules={[{ required: true, message: "Price is required" }]}
-                            >
-                                <InputNumber<number>
-                                    precision={2}
-                                    formatter={(value) =>
-                                        `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                    }
-                                    parser={(value) =>
-                                        value?.replace(/₱\s?|(,*)/g, "") as unknown as number
-                                    }
-                                    readOnly={view.visible}
-                                />
-                            </Form.Item>
-                        </div>
-
-                        <Form.Item label="Photo (optional)" name="photo">
-                            <Upload
-                                listType="picture"
-                                // defaultFileList={fileList}
-                                beforeUpload={() => false}
-                                onChange={handleChange}
-                                maxCount={1}
-                                style={{ width: "100%" }}
-                            >
-                                {(add.visible || edit.visible) && (
-                                    <Button icon={<UploadOutlined />} style={{ width: "100%" }}>
-                                        Upload
-                                    </Button>
-                                )}
-                            </Upload>
+                            <InputNumber<number>
+                                precision={2}
+                                formatter={(value) =>
+                                    `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                }
+                                parser={(value) =>
+                                    value?.replace(/₱\s?|(,*)/g, "") as unknown as number
+                                }
+                                readOnly={view.visible}
+                            />
                         </Form.Item>
                     </div>
+
+                    <Form.Item label="Photo (optional)" name="photo">
+                        <Upload
+                            listType="picture"
+                            // defaultFileList={fileList}
+                            beforeUpload={() => false}
+                            onChange={handleChange}
+                            maxCount={1}
+                            style={{ width: "100%" }}
+                        >
+                            {(add.visible || edit.visible) && (
+                                <Button icon={<UploadOutlined />} style={{ width: "100%" }}>
+                                    Upload
+                                </Button>
+                            )}
+                        </Upload>
+                    </Form.Item>
                 </Form>
             </Drawer>
         </>
