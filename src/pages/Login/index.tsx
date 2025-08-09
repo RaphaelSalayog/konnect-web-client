@@ -19,31 +19,22 @@ type FieldType = {
 const content = [
     {
         key: "1",
-        image: "/images/organizing-projects.svg",
-        title: "Improved Project Tracking and Accountability",
-        description:
-            "Provides real-time updates on project progress, timelines, and resource allocation.",
+        image: "/images/dashboard.svg",
+        title: "Centralized Business Overview",
+        description: "View sales, inventory, and customer data in one easy-to-read dashboard.",
     },
     {
         key: "2",
-        image: "/images/standup-meeting.svg",
-        title: "Efficient Resource Management",
+        image: "/images/centralized_order_processing.svg",
+        title: "Centralized Order Processing",
         description:
-            "Helps optimize material, labor, and budget allocation to avoid delays and cost overruns.",
+            "Manage online and in-store orders from one dashboard for smoother operations.",
     },
     {
         key: "3",
-        image: "/images/building-safety.svg",
-        title: "Risk Identification and Mitigation",
-        description:
-            "Detects potential risks and delays early through automated alerts and reports.",
-    },
-    {
-        key: "4",
-        image: "/images/online-report.svg",
-        title: "Data-Driven Decision Making",
-        description:
-            "Centralizes data for analysis and reporting to helps stakeholders make informed decisions based on accurate project metrics.",
+        image: "/images/integrated_payment_solutions.svg",
+        title: "Integrated Payment Solutions",
+        description: "Accept multiple payment methods with secure and fast processing.",
     },
 ];
 
