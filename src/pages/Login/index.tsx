@@ -1,6 +1,8 @@
 "use client";
 
-import { Button, Carousel, Form, FormProps, Input, Layout, Row, Typography } from "antd";
+import GoogleButton from "@/components/Button/GoogleButton";
+import { Button, Carousel, Divider, Form, FormProps, Input, Layout, Row, Typography } from "antd";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -80,68 +82,74 @@ const Login = () => {
                     backgroundColor: "white",
                 }}
             >
-                <div className="w-[40%] !space-y-6">
-                    <div className="flex flex-col items-center justify-center !space-y-2">
-                        <Title
-                            level={3}
-                            style={{
-                                textAlign: "center",
-                                fontWeight: "bold",
-                                letterSpacing: "0.05rem",
-                            }}
+                <div className="w-[40%]">
+                    <div className="!space-y-6">
+                        <div className="flex flex-col items-center justify-center !space-y-2">
+                            <Title
+                                level={3}
+                                style={{
+                                    textAlign: "center",
+                                    fontWeight: "bold",
+                                    letterSpacing: "0.05rem",
+                                }}
+                            >
+                                Konnect
+                            </Title>
+                            <Text type="secondary" style={{ textAlign: "center" }}>
+                                An eCommerce and POS management system that seamlessly unifies your
+                                online and in-store sales.
+                            </Text>
+                        </div>
+                        <Form
+                            layout="vertical"
+                            name="basic"
+                            initialValues={{ remember: true }}
+                            onFinish={onFinish}
+                            onFinishFailed={onFinishFailed}
+                            autoComplete="off"
                         >
-                            Konnect
-                        </Title>
-                        <Text type="secondary" style={{ textAlign: "center" }}>
-                            An eCommerce and POS management system that seamlessly unifies your
-                            online and in-store sales.
-                        </Text>
-                    </div>
-                    <Form
-                        layout="vertical"
-                        name="basic"
-                        initialValues={{ remember: true }}
-                        onFinish={onFinish}
-                        onFinishFailed={onFinishFailed}
-                        autoComplete="off"
-                    >
-                        <Form.Item<FieldType>
-                            name="email"
-                            rules={[{ required: true, message: "Please input your email!" }]}
-                        >
-                            <Input placeholder="Email" />
-                        </Form.Item>
+                            <Form.Item<FieldType>
+                                name="email"
+                                rules={[{ required: true, message: "Please input your email!" }]}
+                            >
+                                <Input placeholder="Email" />
+                            </Form.Item>
 
-                        <Form.Item<FieldType>
-                            name="password"
-                            rules={[{ required: true, message: "Please input your password!" }]}
-                        >
-                            <Input.Password placeholder="Password" />
-                        </Form.Item>
+                            <Form.Item<FieldType>
+                                name="password"
+                                rules={[{ required: true, message: "Please input your password!" }]}
+                            >
+                                <Input.Password placeholder="Password" />
+                            </Form.Item>
 
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            className="w-full"
-                            loading={isLoading}
-                        >
-                            Login
-                        </Button>
-                    </Form>
-                    <div className="text-sm flex justify-between">
-                        <Link
-                            href="/register-account"
-                            className="text-blue-600 font-medium underline-offset-4 transition-all hover:underline hover:text-blue-700"
-                        >
-                            Register
-                        </Link>
-                        <Link
-                            href="/register"
-                            className="text-blue-600 font-medium underline-offset-4 transition-all hover:underline hover:text-blue-700"
-                        >
-                            Forgot Password
-                        </Link>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                className="w-full"
+                                loading={isLoading}
+                            >
+                                Login
+                            </Button>
+                        </Form>
+                        <div className="text-sm flex justify-between">
+                            <Link
+                                href="/register-account"
+                                className="text-blue-600 font-medium underline-offset-4 transition-all hover:underline hover:text-blue-700"
+                            >
+                                Register
+                            </Link>
+                            <Link
+                                href="/register"
+                                className="text-blue-600 font-medium underline-offset-4 transition-all hover:underline hover:text-blue-700"
+                            >
+                                Forgot Password
+                            </Link>
+                        </div>
                     </div>
+                    <Divider>
+                        <span className="text-sm text-zinc-400">or</span>
+                    </Divider>
+                    <GoogleButton onClick={() => signIn("google")} />
                 </div>
             </Content>
         </Layout>
