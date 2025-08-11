@@ -1,12 +1,14 @@
 "use client";
 
+import { getAllInventory } from "@/app/api/inventory-service";
 import CustomActionButtons from "@/components/CustomActionButtons";
 import TitlePage from "@/components/TitlePage";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
 import { CheckCircleFilled, PlusOutlined } from "@ant-design/icons";
 import { Button, Input, message, Modal, Table, TableProps, Tag, Tooltip } from "antd";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import EmployeeFormDrawer from "./FormDrawer";
 
 const { Search } = Input;
@@ -24,64 +26,13 @@ interface DataType {
     category: string;
 }
 
-const data: DataType[] = [
-    {
-        key: "1",
-        photo: { url: "https://images.unsplash.com/photo-1514996937319-344454492b37" },
-        name: "Kimchi Classic",
-        description: "Traditional napa cabbage kimchi (500 g jar)",
-        quantity: 25,
-        unit_cost: 2.5,
-        price: 4.99,
-        category: "Electronics",
-    },
-    {
-        key: "2",
-        photo: { url: "https://images.unsplash.com/photo-1606755962775-0e59c9d7f5e8" },
-        name: "Spicy Radish Kimchi",
-        description: "Cubed radish kimchi with extra‑hot gochugaru",
-        quantity: 18,
-        unit_cost: 2.1,
-        price: 4.49,
-        category: "Electronics",
-    },
-    {
-        key: "3",
-        photo: { url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061" },
-        name: "Kimchi Pancake Mix",
-        description: "Ready‑to‑cook 400 g batter mix",
-        quantity: 60,
-        unit_cost: 1.2,
-        price: 2.99,
-        category: "Electronics",
-    },
-    {
-        key: "4",
-        photo: { url: "https://images.unsplash.com/photo-1600986604128-8c42b81eecb3" },
-        name: "Kimchi Dumplings",
-        description: "Frozen 20‑piece pack, pork & kimchi filling",
-        quantity: 40,
-        unit_cost: 3.8,
-        price: 7.49,
-        category: "Electronics",
-    },
-    {
-        key: "5",
-        photo: { url: "https://images.unsplash.com/photo-1589301913259-d47db05c1d5a" },
-        name: "Kimchi Ramen Bowl",
-        description:
-            "Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi",
-        quantity: 120,
-        unit_cost: 0.95,
-        price: 2.25,
-        category: "Electronics",
-    },
-];
-
 const Inventory = () => {
+    const { data: session } = useSession();
     const [modal, contextHolderModal] = Modal.useModal();
     const [messageApi, contextHolderMessage] = message.useMessage();
     const { add, edit, view, id } = useContext(DrawerContext);
+    const [dataSet, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const columns: TableProps<DataType>["columns"] = [
         {
@@ -211,6 +162,28 @@ const Inventory = () => {
         },
     ];
 
+    useEffect(() => {
+        const fetch = async () => {
+            setLoading(true);
+            try {
+                if (session?.token) {
+                    const resp = await getAllInventory({
+                        token: session?.token,
+                    });
+
+                    if (resp.ok) {
+                        setData(resp.data);
+                    }
+                }
+            } catch (err) {
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetch();
+    }, [session?.token]);
+
     return (
         <>
             {contextHolderModal}
@@ -234,7 +207,9 @@ const Inventory = () => {
                         tableLayout="auto"
                         scroll={{ x: "max-content" }}
                         columns={columns}
-                        dataSource={data}
+                        dataSource={dataSet}
+                        loading={loading}
+                        rowKey="id"
                     />
                 </div>
             </TitlePage>

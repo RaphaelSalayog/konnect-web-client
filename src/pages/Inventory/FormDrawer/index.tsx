@@ -230,7 +230,11 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
                         </Form.Item>
                     </div>
 
-                    <Form.Item label="Photo (optional)" name="photo">
+                    <Form.Item
+                        label="Photo"
+                        name="photo"
+                        rules={[{ required: true, message: "Photo is required" }]}
+                    >
                         <Upload
                             listType="picture"
                             // defaultFileList={fileList}

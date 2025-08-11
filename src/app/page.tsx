@@ -1,8 +1,22 @@
+"use client";
+
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 export default function Home() {
-    return (
-        <div className="font-sans min-h-screen">
-            <main className=""></main>
-            <footer className=""></footer>
-        </div>
-    );
+    const { status } = useSession();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (status === "loading") return;
+
+        if (status === "unauthenticated") {
+            router.push("/login");
+        } else if (status === "authenticated") {
+            router.push("/dashboard");
+        }
+    }, [status, router]);
+
+    return null;
 }
