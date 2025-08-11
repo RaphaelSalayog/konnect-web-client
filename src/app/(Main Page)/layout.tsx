@@ -3,6 +3,7 @@
 import { routes } from "@/constants/routes";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
+import { signOut } from "next-auth/react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -61,7 +62,10 @@ export default function RootLayout({
                     defaultSelectedKeys={[pathname?.split("/")[1] || ""]}
                     items={routes.map(({ route, ...restData }) => ({
                         ...restData,
-                        onClick: () => router.push(route),
+                        onClick: () => {
+                            restData.key === "logout" && signOut({ callbackUrl: "/login" });
+                            router.push(route);
+                        },
                     }))}
                 />
             </Sider>

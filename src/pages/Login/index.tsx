@@ -1,6 +1,7 @@
 "use client";
 
 import GoogleButton from "@/components/Button/GoogleButton";
+import { carouselContent } from "@/constants/carousel";
 import { Button, Carousel, Divider, Form, FormProps, Input, Layout, Row, Typography } from "antd";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
@@ -13,55 +14,56 @@ const { Title, Text } = Typography;
 const { Sider, Content } = Layout;
 
 type FieldType = {
-    email?: string;
+    username?: string;
     password?: string;
     remember?: string;
 };
 
-const content = [
-    {
-        key: "1",
-        image: "/images/dashboard.svg",
-        title: "Centralized Business Overview",
-        description: "View sales, inventory, and customer data in one easy-to-read dashboard.",
-    },
-    {
-        key: "2",
-        image: "/images/centralized_order_processing.svg",
-        title: "Centralized Order Processing",
-        description:
-            "Manage online and in-store orders from one dashboard for smoother operations.",
-    },
-    {
-        key: "3",
-        image: "/images/integrated_payment_solutions.svg",
-        title: "Integrated Payment Solutions",
-        description: "Accept multiple payment methods with secure and fast processing.",
-    },
-];
-
 const Login = () => {
     const router = useRouter();
+    const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
 
-    const onFinish: FormProps<FieldType>["onFinish"] = useCallback((values: any) => {
-        console.log("Success:", values);
+    const onFinish: FormProps<FieldType>["onFinish"] = useCallback(async (values: any) => {
         setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-            router.push("/home");
-        }, 3000);
-    }, []);
+        const { username, password } = values;
+        try {
+            const resp = await signIn("credentials", {
+                redirect: false,
+                username,
+                password,
+            });
 
-    const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = useCallback((errorInfo: any) => {
-        console.log("Failed:", errorInfo);
+            if (resp?.ok) {
+                router.push("/dashboard");
+            } else {
+                if (resp?.error === "Username does not exist!") {
+                    form.setFields([
+                        {
+                            name: "username",
+                            errors: [resp.error],
+                        },
+                    ]);
+                } else if (resp?.error === "Invalid credentials!") {
+                    form.setFields([
+                        {
+                            name: "password",
+                            errors: [resp.error],
+                        },
+                    ]);
+                }
+            }
+        } catch (error) {
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
     return (
         <Layout style={{ minHeight: "100vh" }}>
             <Sider width="50%" style={{ backgroundColor: "#003a8c" }}>
                 <Carousel autoplay>
-                    {content.map((item) => (
+                    {carouselContent.map((item) => (
                         <Row key={item.key}>
                             <div className="h-screen bg-[#003a8c] flex flex-col items-center justify-center">
                                 <Image src={item.image} width={550} height={550} alt={item.title} />
@@ -101,18 +103,18 @@ const Login = () => {
                             </Text>
                         </div>
                         <Form
+                            form={form}
                             layout="vertical"
                             name="basic"
                             initialValues={{ remember: true }}
                             onFinish={onFinish}
-                            onFinishFailed={onFinishFailed}
                             autoComplete="off"
                         >
                             <Form.Item<FieldType>
-                                name="email"
-                                rules={[{ required: true, message: "Please input your email!" }]}
+                                name="username"
+                                rules={[{ required: true, message: "Please input your username!" }]}
                             >
-                                <Input placeholder="Email" />
+                                <Input placeholder="Username" />
                             </Form.Item>
 
                             <Form.Item<FieldType>

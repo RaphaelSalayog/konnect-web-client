@@ -1,4 +1,9 @@
-import { DashboardOutlined, FolderOutlined, LaptopOutlined } from "@ant-design/icons";
+import {
+    DashboardOutlined,
+    FolderOutlined,
+    LaptopOutlined,
+    LogoutOutlined,
+} from "@ant-design/icons";
 
 export const routes = [
     {
@@ -24,5 +29,11 @@ export const routes = [
         icon: <FolderOutlined />,
         label: "Order",
         route: "/order",
+    },
+    {
+        key: "logout",
+        icon: <LogoutOutlined />,
+        label: "Logout",
+        route: "/login",
     },
 ];
