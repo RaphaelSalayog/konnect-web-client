@@ -3,18 +3,19 @@
 import { getAllInventory } from "@/app/api/inventory-service";
 import CustomActionButtons from "@/components/CustomActionButtons";
 import TitlePage from "@/components/TitlePage";
+import useTable from "@/hooks/useTable";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
 import { CheckCircleFilled, PlusOutlined } from "@ant-design/icons";
 import { Button, Input, message, Modal, Table, TableProps, Tag, Tooltip } from "antd";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import EmployeeFormDrawer from "./FormDrawer";
 
 const { Search } = Input;
 
 interface DataType {
-    key: string;
+    id: number;
     photo: {
         url: string;
     };
@@ -31,8 +32,8 @@ const Inventory = () => {
     const [modal, contextHolderModal] = Modal.useModal();
     const [messageApi, contextHolderMessage] = message.useMessage();
     const { add, edit, view, id } = useContext(DrawerContext);
-    const [dataSet, setData] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const { dataSet, setData, loading, setLoading, search, setSearch, pagination, setPagination } =
+        useTable();
 
     const columns: TableProps<DataType>["columns"] = [
         {
@@ -168,11 +169,19 @@ const Inventory = () => {
             try {
                 if (session?.token) {
                     const resp = await getAllInventory({
+                        payload: {
+                            search: search,
+                            pagination: {
+                                page: pagination.current,
+                                limit: pagination.pageSize,
+                            },
+                        },
                         token: session?.token,
                     });
 
                     if (resp.ok) {
-                        setData(resp.data);
+                        setData(resp.data.lists);
+                        setPagination((prev) => ({ ...prev, total: resp.data.total }));
                     }
                 }
             } catch (err) {
@@ -182,7 +191,16 @@ const Inventory = () => {
         };
 
         fetch();
-    }, [session?.token]);
+    }, [session?.token, pagination.current, pagination.pageSize, search]);
+
+    const handleTableChange: TableProps<DataType>["onChange"] = (pagination) => {
+        setPagination((prev) => ({ ...prev, ...pagination }));
+
+        // `dataSource` is useless since `pageSize` changed
+        if (pagination.pageSize !== pagination.pageSize) {
+            setData([]);
+        }
+    };
 
     return (
         <>
@@ -191,7 +209,13 @@ const Inventory = () => {
             <TitlePage title="Inventory">
                 <div className="!space-y-6">
                     <div className="flex !justify-end gap-4">
-                        <Search placeholder="Name" className="w-100!" allowClear enterButton />
+                        <Search
+                            placeholder="Name"
+                            className="w-100!"
+                            allowClear
+                            enterButton
+                            onSearch={(e) => setSearch(e)}
+                        />
                         <Button
                             type="primary"
                             size="middle"
@@ -205,11 +229,13 @@ const Inventory = () => {
                     </div>
                     <Table<DataType>
                         tableLayout="auto"
-                        scroll={{ x: "max-content" }}
+                        scroll={{ x: "max-content" }} //y: 554
                         columns={columns}
                         dataSource={dataSet}
                         loading={loading}
-                        rowKey="id"
+                        pagination={pagination}
+                        onChange={handleTableChange}
+                        rowKey={(record) => record.id}
                     />
                 </div>
             </TitlePage>

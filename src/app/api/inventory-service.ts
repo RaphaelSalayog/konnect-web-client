@@ -5,7 +5,7 @@ const url = process.env.NEXT_PUBLIC_API_URL;
 interface IGetAllInventoryApi {
     payload?: {
         search?: string;
-        pagination?: { page: number; limit: number };
+        pagination?: { page?: number; limit?: number };
     };
     token: string | undefined;
 }
