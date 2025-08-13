@@ -7,7 +7,7 @@ import React, { useContext } from "react";
 
 interface DataType {
     key: string;
-    photo: {
+    attachments: {
         url: string;
     };
     name: string;
@@ -21,7 +21,7 @@ interface DataType {
 const data: DataType[] = [
     {
         key: "1",
-        photo: { url: "https://images.unsplash.com/photo-1514996937319-344454492b37" },
+        attachments: { url: "https://images.unsplash.com/photo-1514996937319-344454492b37" },
         name: "Kimchi Classic",
         description: "Traditional napa cabbage kimchi (500 g jar)",
         quantity: 25,
@@ -31,7 +31,7 @@ const data: DataType[] = [
     },
     {
         key: "2",
-        photo: { url: "https://images.unsplash.com/photo-1606755962775-0e59c9d7f5e8" },
+        attachments: { url: "https://images.unsplash.com/photo-1606755962775-0e59c9d7f5e8" },
         name: "Spicy Radish Kimchi",
         description: "Cubed radish kimchi with extra‑hot gochugaru",
         quantity: 18,
@@ -41,7 +41,7 @@ const data: DataType[] = [
     },
     {
         key: "3",
-        photo: { url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061" },
+        attachments: { url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061" },
         name: "Kimchi Pancake Mix",
         description: "Ready‑to‑cook 400 g batter mix",
         quantity: 60,
@@ -51,7 +51,7 @@ const data: DataType[] = [
     },
     {
         key: "4",
-        photo: { url: "https://images.unsplash.com/photo-1600986604128-8c42b81eecb3" },
+        attachments: { url: "https://images.unsplash.com/photo-1600986604128-8c42b81eecb3" },
         name: "Kimchi Dumplings",
         description: "Frozen 20‑piece pack, pork & kimchi filling",
         quantity: 40,
@@ -61,7 +61,7 @@ const data: DataType[] = [
     },
     {
         key: "5",
-        photo: { url: "https://images.unsplash.com/photo-1589301913259-d47db05c1d5a" },
+        attachments: { url: "https://images.unsplash.com/photo-1589301913259-d47db05c1d5a" },
         name: "Kimchi Ramen Bowl",
         description:
             "Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi Instant noodles with dehydrated kimchi",
@@ -75,12 +75,12 @@ const data: DataType[] = [
 const columns: TableProps<DataType>["columns"] = [
     {
         title: "Photo",
-        dataIndex: "photo",
-        key: "photo",
-        render: (photo, record) => (
+        dataIndex: "attachments",
+        key: "attachments",
+        render: (attachments, record) => (
             <div className="relative w-20 h-20 rounded-sm overflow-hidden">
-                {/* {photo?.url && (
-                    <Image src={photo.url} alt={record.first_name} fill className="object-cover" />
+                {/* {attachments?.url && (
+                    <Image src={attachments.url} alt={record.first_name} fill className="object-cover" />
                 )} */}
                 <Image
                     src={

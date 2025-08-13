@@ -16,7 +16,7 @@ const { Search } = Input;
 
 interface DataType {
     id: number;
-    photo: {
+    attachments: {
         url: string;
     };
     name: string;
@@ -38,12 +38,12 @@ const Inventory = () => {
     const columns: TableProps<DataType>["columns"] = [
         {
             title: "Photo",
-            dataIndex: "photo",
-            key: "photo",
-            render: (photo, record) => (
+            dataIndex: "attachments",
+            key: "attachments",
+            render: (attachments, record) => (
                 <div className="relative w-20 h-20 rounded-sm overflow-hidden">
-                    {/* {photo?.url && (
-                    <Image src={photo.url} alt={record.first_name} fill className="object-cover" />
+                    {/* {attachments?.url && (
+                    <Image src={attachments.url} alt={record.first_name} fill className="object-cover" />
                 )} */}
                     <Image
                         src={

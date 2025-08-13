@@ -1,8 +1,13 @@
 "use client";
 
+import { createInventory } from "@/app/api/inventory-service";
+import { STORAGE_NAME } from "@/constants/constants";
 // import { createEmployee, getEmployeeById, updateEmployee } from "@/api/employee";
 // import { STORAGE_NAME } from "@/constants/constants";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
+import { IAttachment } from "@/types/attachment";
+import customFileName from "@/util/customFileName";
+import { supabase } from "@/util/supabaseClient";
 import { PlusOutlined, SaveOutlined, UploadOutlined } from "@ant-design/icons";
 // import { createClient } from "@supabase/supabase-js";
 import {
@@ -14,39 +19,42 @@ import {
     InputNumber,
     message,
     Modal,
+    Select,
     Space,
     Upload,
     UploadFile,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import moment from "moment";
+import { useSession } from "next-auth/react";
 import { useCallback, useContext, useState } from "react";
 
 interface IProjectFormDrawer {
     reload: () => void;
 }
 
+type IUpload = {
+    file: UploadFile;
+    fileList: UploadFile[];
+    event?: { percent: number };
+};
+
 interface FieldType {
-    country: string;
-    account_type: string;
-    username: string;
-    last_name: string;
-    first_name: string;
-    email: string;
-    contact_number: string;
-    photo: any;
+    name: string;
+    description: string;
+    quantity: number;
+    price: number;
+    unit_cost: number;
+    attachments: IUpload;
 }
 
-const dateTimeId = moment().format("YYYYMMDD_HHmmss_SSS");
-
 const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
+    const { data: session } = useSession();
     const [modal, contextHolderModal] = Modal.useModal();
     const [messageApi, contextHolderMessage] = message.useMessage();
     const [form] = Form.useForm();
     const { view, add, edit, id } = useContext(DrawerContext);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [fileList, setFileList] = useState<UploadFile[]>([]);
 
     const onClose = useCallback(() => {
         view.setVisible(false);
@@ -54,13 +62,8 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
         edit.setVisible(false);
     }, []);
 
-    // const supabase = createClient(
-    //     process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-    //     process.env.NEXT_PUBLIC_SUPABASE_KEY || ""
-    // );
-
     // useEffect(() => {
-    //     const func = async () => {
+    //     const fetch = async () => {
     //         if (id.value && edit.visible) {
     //             setIsLoading(true);
     //             try {
@@ -70,10 +73,10 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
     //                 setFileList([
     //                     {
     //                         uid: "0",
-    //                         name: data.photo.name,
+    //                         name: data.attachment.name,
     //                         status: "done",
-    //                         url: data.photo.url,
-    //                         thumbUrl: data.photo.url,
+    //                         url: data.attachment.url,
+    //                         thumbUrl: data.attachment.url,
     //                     },
     //                 ]);
     //             } catch (error) {
@@ -82,7 +85,7 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
     //             }
     //         }
     //     };
-    //     func();
+    //     fetch();
     // }, [id.value, edit.visible]);
 
     const onClickSubmit = useCallback(() => {
@@ -105,23 +108,90 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
                 okText: "YES",
             });
         } else {
-            setFileList([]);
+            // setFileList([]);
             onClose();
         }
     }, [form, modal, onClose]);
 
-    const onFinish: FormProps<FieldType>["onFinish"] = useCallback(async (values: FieldType) => {
-        console.log("values >> ", values);
-    }, []);
+    const onFinish: FormProps<FieldType>["onFinish"] = useCallback(
+        async (values: FieldType) => {
+            console.log("values >> ", values);
+            setIsSubmitting(true);
+            try {
+                let uploadedAttachments: IAttachment[] = [];
+                const fileList = values.attachments.fileList;
+                if (fileList.length > 0) {
+                    const attachments = await Promise.all(
+                        fileList.map(async (file) => {
+                            const { data, error } = await supabase.storage
+                                .from(STORAGE_NAME.inventory)
+                                .upload(customFileName(file), (file as any).originFileObj, {
+                                    cacheControl: "3600",
+                                    upsert: true,
+                                });
 
-    const handleChange = ({ fileList }: any) => {
-        setFileList(fileList);
-        if (fileList.length === 0) {
-            form.setFieldsValue({ photo: null });
-        } else {
-            form.setFieldsValue({ photo: fileList[0] });
-        }
-    };
+                            if (error) {
+                                throw error;
+                            }
+
+                            console.log(`Uploaded ${file.name} to:`, data?.path);
+                            return { file_name: file.name, s3_key: data?.path };
+                        })
+                    );
+                    uploadedAttachments = attachments;
+                }
+
+                if (add.visible) {
+                    const resp = await createInventory({
+                        payload: { ...values, attachments: uploadedAttachments },
+                        token: session?.token,
+                    });
+
+                    if (resp.status === 201) {
+                        messageApi.open({
+                            type: "success",
+                            content: "Item added successfully!",
+                        });
+                    } else {
+                        messageApi.open({
+                            type: "error",
+                            content: "Failed to add item!",
+                        });
+                    }
+                }
+
+                // if (edit.visible) {
+                //     const resp = await updateEmployee({
+                //         id: id.value,
+                //         payload: { ...values, attachment: signedUrl ? signedUrl : values.attachment },
+                //     });
+                //     if (resp.status === 200) {
+                //         messageApi.open({
+                //             type: "success",
+                //             content: "Employee update successfully!",
+                //         });
+                //     } else {
+                //         messageApi.open({
+                //             type: "error",
+                //             content: "Failed to update employee!",
+                //         });
+                //     }
+                //     id.setValue("");
+                // }
+                // reload();
+            } catch (error) {
+                messageApi.open({
+                    type: "error",
+                    content: "Something went wrong!",
+                });
+            } finally {
+                setIsSubmitting(false);
+                // setFileList([]);
+                onClose();
+            }
+        },
+        [add.visible, edit.visible]
+    );
 
     return (
         <>
@@ -187,11 +257,32 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
                     </Form.Item>
 
                     <Form.Item
+                        label="Category"
+                        name="category"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Category is required",
+                            },
+                        ]}
+                    >
+                        <Select
+                            className="!w-full"
+                            allowClear
+                            options={[
+                                { value: "beverages", label: "Beverages" },
+                                { value: "meal", label: "Meal" },
+                            ]}
+                            placeholder="select category"
+                        />
+                    </Form.Item>
+
+                    <Form.Item
                         label="Quantity"
                         name="quantity"
                         rules={[{ required: true, message: "Quantity is required" }]}
                     >
-                        <Input allowClear readOnly={view.visible} />
+                        <InputNumber readOnly={view.visible} />
                     </Form.Item>
 
                     <div className="grid grid-cols-2 gap-x-5.5">
@@ -232,15 +323,14 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
 
                     <Form.Item
                         label="Photo"
-                        name="photo"
+                        name="attachments"
                         rules={[{ required: true, message: "Photo is required" }]}
                     >
                         <Upload
                             listType="picture"
-                            // defaultFileList={fileList}
                             beforeUpload={() => false}
-                            onChange={handleChange}
-                            maxCount={1}
+                            maxCount={5}
+                            multiple
                             style={{ width: "100%" }}
                         >
                             {(add.visible || edit.visible) && (
