@@ -1,15 +1,12 @@
 "use client";
 
-import { createInventory } from "@/app/api/inventory-service";
+import { createInventory, getInventoryById } from "@/app/api/inventory-service";
 import { BUCKET_NAME } from "@/constants/constants";
-// import { createEmployee, getEmployeeById, updateEmployee } from "@/api/employee";
-// import { STORAGE_NAME } from "@/constants/constants";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
 import { IAttachment } from "@/types/attachment";
 import customFileName from "@/util/customFileName";
 import { supabase } from "@/util/supabaseClient";
 import { PlusOutlined, SaveOutlined, UploadOutlined } from "@ant-design/icons";
-// import { createClient } from "@supabase/supabase-js";
 import {
     Button,
     Drawer,
@@ -26,17 +23,11 @@ import {
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { useSession } from "next-auth/react";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 
-interface IProjectFormDrawer {
+interface IInventoryFormDrawer {
     reload: () => void;
 }
-
-type IUpload = {
-    file: UploadFile;
-    fileList: UploadFile[];
-    event?: { percent: number };
-};
 
 interface FieldType {
     name: string;
@@ -44,10 +35,10 @@ interface FieldType {
     quantity: number;
     price: number;
     unit_cost: number;
-    attachments: IUpload;
+    attachments: UploadFile[];
 }
 
-const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
+const InventoryFormDrawer: React.FC<IInventoryFormDrawer> = ({ reload }) => {
     const { data: session } = useSession();
     const [modal, contextHolderModal] = Modal.useModal();
     const [messageApi, contextHolderMessage] = message.useMessage();
@@ -56,70 +47,56 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const onClose = useCallback(() => {
-        view.setVisible(false);
-        add.setVisible(false);
-        edit.setVisible(false);
-    }, []);
+    useEffect(() => {
+        const fetch = async () => {
+            if (id.value && (view.visible || edit.visible)) {
+                setIsLoading(true);
+                try {
+                    const resp = await getInventoryById({
+                        payload: { id: id.value },
+                        token: session?.token,
+                    });
 
-    // useEffect(() => {
-    //     const fetch = async () => {
-    //         if (id.value && edit.visible) {
-    //             setIsLoading(true);
-    //             try {
-    //                 const resp = await getEmployeeById({ id: id.value });
-    //                 const data = resp.data.data;
-    //                 form.setFieldsValue(data);
-    //                 setFileList([
-    //                     {
-    //                         uid: "0",
-    //                         name: data.attachment.name,
-    //                         status: "done",
-    //                         url: data.attachment.url,
-    //                         thumbUrl: data.attachment.url,
-    //                     },
-    //                 ]);
-    //             } catch (error) {
-    //             } finally {
-    //                 setIsLoading(false);
-    //             }
-    //         }
-    //     };
-    //     fetch();
-    // }, [id.value, edit.visible]);
+                    if (!resp.ok) {
+                        throw new Error();
+                    }
+
+                    const data = resp.data;
+                    const attachments = resp.data.attachments.map((attachment: IAttachment) => ({
+                        uid: attachment.id,
+                        name: attachment.file_name,
+                        status: "done",
+                        url: attachment.presignedUrl,
+                    }));
+
+                    form.setFieldsValue({
+                        ...data,
+                        attachments: attachments,
+                    });
+                } catch (error) {
+                    messageApi.open({
+                        type: "error",
+                        content: "Something went wrong!",
+                    });
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        };
+        fetch();
+    }, [id.value, view.visible, edit.visible, session?.token]);
 
     const onClickSubmit = useCallback(() => {
         form.submit();
     }, [form]);
 
-    const onCloseForm = useCallback(() => {
-        if (form.isFieldsTouched()) {
-            modal.confirm({
-                title: "Confirm Discard",
-                content: (
-                    <>
-                        <p>Are you sure you want to discard changes?</p>
-                        <p>This action cannot be undone.</p>
-                    </>
-                ),
-                onOk: () => {
-                    onClose();
-                },
-                okText: "YES",
-            });
-        } else {
-            // setFileList([]);
-            onClose();
-        }
-    }, [form, modal, onClose]);
-
     const onFinish: FormProps<FieldType>["onFinish"] = useCallback(
         async (values: FieldType) => {
-            console.log("values >> ", values);
             setIsSubmitting(true);
             try {
                 let uploadedAttachments: IAttachment[] = [];
-                const fileList = values.attachments.fileList;
+                const fileList = values.attachments;
+
                 if (fileList.length > 0) {
                     const attachments = await Promise.all(
                         fileList.map(async (file) => {
@@ -195,6 +172,41 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
         },
         [add.visible, edit.visible]
     );
+
+    const onClose = useCallback(() => {
+        view.setVisible(false);
+        add.setVisible(false);
+        edit.setVisible(false);
+    }, []);
+
+    const onCloseForm = useCallback(() => {
+        if (form.isFieldsTouched()) {
+            modal.confirm({
+                title: "Confirm Discard",
+                content: (
+                    <>
+                        <p>Are you sure you want to discard changes?</p>
+                        <p>This action cannot be undone.</p>
+                    </>
+                ),
+                onOk: () => {
+                    onClose();
+                },
+                okText: "YES",
+            });
+        } else {
+            // setFileList([]);
+            onClose();
+        }
+    }, [form, modal, onClose]);
+
+    const normFile = (e: any) => {
+        console.log("Upload event:", e);
+        if (Array.isArray(e)) {
+            return e;
+        }
+        return e?.fileList;
+    };
 
     return (
         <>
@@ -327,14 +339,18 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
                     <Form.Item
                         label="Photo"
                         name="attachments"
+                        valuePropName="fileList"
+                        getValueFromEvent={normFile}
                         rules={[{ required: true, message: "Photo is required" }]}
                     >
                         <Upload
+                            fileList={form.getFieldValue("attachments") as any}
                             listType="picture"
                             beforeUpload={() => false}
                             maxCount={5}
                             multiple
                             style={{ width: "100%" }}
+                            disabled={view.visible}
                         >
                             {(add.visible || edit.visible) && (
                                 <Button icon={<UploadOutlined />} style={{ width: "100%" }}>
@@ -349,4 +365,4 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
     );
 };
 
-export default EmployeeFormDrawer;
+export default InventoryFormDrawer;

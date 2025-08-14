@@ -8,8 +8,8 @@ interface DrawerState {
 }
 
 interface IdState {
-    value: any;
-    setValue: any;
+    value: number | null | undefined;
+    setValue: React.Dispatch<React.SetStateAction<number | null | undefined>>;
 }
 
 interface DrawerContextType {
@@ -20,7 +20,7 @@ interface DrawerContextType {
     id: IdState;
 }
 
-const initialState = {
+const initialState: DrawerContextType = {
     add: {
         visible: false,
         setVisible: (() => {}) as React.Dispatch<React.SetStateAction<boolean>>,
@@ -39,7 +39,7 @@ const initialState = {
     },
     id: {
         value: undefined,
-        setValue: undefined,
+        setValue: (() => {}) as React.Dispatch<React.SetStateAction<number | null | undefined>>,
     },
 };
 
@@ -50,25 +50,16 @@ const DrawerVisibilityContext = ({ children }: { children: ReactNode }) => {
     const [isViewVisible, setIsViewVisible] = useState(false);
     const [isEditVisible, setIsEditVisible] = useState(false);
     const [isRemoveVisible, setIsRemoveVisible] = useState(false);
-    const [id, setId] = useState<string>("");
+    const [id, setId] = useState<number | null | undefined>(undefined);
 
     return (
         <DrawerContext.Provider
             value={{
-                add: {
-                    visible: isAddVisible,
-                    setVisible: setIsAddVisible,
-                },
+                add: { visible: isAddVisible, setVisible: setIsAddVisible },
                 view: { visible: isViewVisible, setVisible: setIsViewVisible },
-                edit: {
-                    visible: isEditVisible,
-                    setVisible: setIsEditVisible,
-                },
+                edit: { visible: isEditVisible, setVisible: setIsEditVisible },
                 remove: { visible: isRemoveVisible, setVisible: setIsRemoveVisible },
-                id: {
-                    value: id,
-                    setValue: setId,
-                },
+                id: { value: id, setValue: setId },
             }}
         >
             {children}

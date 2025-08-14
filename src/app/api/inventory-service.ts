@@ -11,6 +11,13 @@ interface IGetAllInventoryApi {
     token: string | undefined;
 }
 
+interface IGetInventoryByIdApi {
+    payload: {
+        id: number;
+    };
+    token: string | undefined;
+}
+
 interface ICreateInventoryApi {
     payload: {
         name: string;
@@ -27,6 +34,16 @@ export const getAllInventory = async ({ payload, token }: IGetAllInventoryApi) =
     return await axiosHelper({
         url: url,
         pathname: "/inventory/getAllInventory",
+        method: "POST",
+        payload,
+        token,
+    });
+};
+
+export const getInventoryById = async ({ payload, token }: IGetInventoryByIdApi) => {
+    return await axiosHelper({
+        url: url,
+        pathname: "/inventory/getInventoryById",
         method: "POST",
         payload,
         token,

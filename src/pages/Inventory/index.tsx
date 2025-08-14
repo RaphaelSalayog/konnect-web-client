@@ -10,7 +10,7 @@ import { CheckCircleFilled, PlusOutlined } from "@ant-design/icons";
 import { Avatar, Button, Input, message, Modal, Table, TableProps, Tag, Tooltip } from "antd";
 import { useSession } from "next-auth/react";
 import { useContext, useEffect } from "react";
-import EmployeeFormDrawer from "./FormDrawer";
+import InventoryFormDrawer from "./FormDrawer";
 
 const { Search } = Input;
 
@@ -133,10 +133,11 @@ const Inventory = () => {
                     actions={["view", "edit", "delete"]}
                     handleView={() => {
                         view.setVisible(true);
+                        id.setValue(record.id);
                     }}
                     handleEdit={() => {
                         edit.setVisible(true);
-                        // id.setValue(record.id);
+                        id.setValue(record.id);
                     }}
                     handleDelete={() => {
                         modal.confirm({
@@ -239,7 +240,7 @@ const Inventory = () => {
                     />
                 </div>
             </TitlePage>
-            <EmployeeFormDrawer reload={() => {}} />
+            <InventoryFormDrawer reload={() => {}} />
         </>
     );
 };
