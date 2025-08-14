@@ -1,3 +1,3 @@
-export const STORAGE_NAME = {
+export const BUCKET_NAME = {
     inventory: "inventory",
 };

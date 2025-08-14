@@ -5,10 +5,10 @@ import CustomActionButtons from "@/components/CustomActionButtons";
 import TitlePage from "@/components/TitlePage";
 import useTable from "@/hooks/useTable";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
+import { IAttachment } from "@/types/attachment";
 import { CheckCircleFilled, PlusOutlined } from "@ant-design/icons";
-import { Button, Input, message, Modal, Table, TableProps, Tag, Tooltip } from "antd";
+import { Avatar, Button, Input, message, Modal, Table, TableProps, Tag, Tooltip } from "antd";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import { useContext, useEffect } from "react";
 import EmployeeFormDrawer from "./FormDrawer";
 
@@ -16,15 +16,13 @@ const { Search } = Input;
 
 interface DataType {
     id: number;
-    attachments: {
-        url: string;
-    };
     name: string;
     description: string;
     quantity: number;
     unit_cost: number;
     price: number;
     category: string;
+    attachments: IAttachment[];
 }
 
 const Inventory = () => {
@@ -40,20 +38,22 @@ const Inventory = () => {
             title: "Photo",
             dataIndex: "attachments",
             key: "attachments",
-            render: (attachments, record) => (
-                <div className="relative w-20 h-20 rounded-sm overflow-hidden">
-                    {/* {attachments?.url && (
-                    <Image src={attachments.url} alt={record.first_name} fill className="object-cover" />
-                )} */}
-                    <Image
-                        src={
-                            "https://cdn.apartmenttherapy.info/image/upload/f_auto,q_auto:eco,c_fill,g_auto,w_1500,ar_3:2/k%2FPhoto%2FSeries%2F2023-11-how-to-make-kimchi%2Fhow-to-make-kimchi-259"
-                        }
-                        alt={"Product"}
-                        fill
-                        className="object-cover"
-                    />
-                </div>
+            render: (attachments) => (
+                <Avatar.Group
+                    size={50}
+                    shape="square"
+                    max={{
+                        count: 2,
+                        style: { color: "white", backgroundColor: "#1677ff" },
+                    }}
+                >
+                    {attachments.map((attachment: any) => (
+                        <Avatar
+                            style={{ backgroundColor: "#1677ff" }}
+                            src={attachment.presignedUrl}
+                        />
+                    ))}
+                </Avatar.Group>
             ),
         },
         {

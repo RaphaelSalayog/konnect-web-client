@@ -1,7 +1,7 @@
 "use client";
 
 import { createInventory } from "@/app/api/inventory-service";
-import { STORAGE_NAME } from "@/constants/constants";
+import { BUCKET_NAME } from "@/constants/constants";
 // import { createEmployee, getEmployeeById, updateEmployee } from "@/api/employee";
 // import { STORAGE_NAME } from "@/constants/constants";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
@@ -124,7 +124,7 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
                     const attachments = await Promise.all(
                         fileList.map(async (file) => {
                             const { data, error } = await supabase.storage
-                                .from(STORAGE_NAME.inventory)
+                                .from(BUCKET_NAME.inventory)
                                 .upload(customFileName(file), (file as any).originFileObj, {
                                     cacheControl: "3600",
                                     upsert: true,
@@ -134,8 +134,11 @@ const EmployeeFormDrawer: React.FC<IProjectFormDrawer> = ({ reload }) => {
                                 throw error;
                             }
 
-                            console.log(`Uploaded ${file.name} to:`, data?.path);
-                            return { file_name: file.name, s3_key: data?.path };
+                            console.log(`Uploaded ${file.name} to:`, data?.fullPath);
+                            return {
+                                file_name: file.name,
+                                file_path: data?.fullPath,
+                            };
                         })
                     );
                     uploadedAttachments = attachments;
