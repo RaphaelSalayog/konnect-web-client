@@ -1,6 +1,6 @@
 "use client";
 
-import { getAllInventory } from "@/app/api/inventory-service";
+import { deleteInventory, getAllInventory } from "@/app/api/inventory-service";
 import CustomActionButtons from "@/components/CustomActionButtons";
 import TitlePage from "@/components/TitlePage";
 import useTable from "@/hooks/useTable";
@@ -33,6 +33,54 @@ const Inventory = () => {
     const { dataSet, setData, loading, setLoading, search, setSearch, pagination, setPagination } =
         useTable();
 
+    const handleView = (record: DataType) => {
+        view.setVisible(true);
+        id.setValue(record.id);
+    };
+
+    const handleEdit = (record: DataType) => {
+        edit.setVisible(true);
+        id.setValue(record.id);
+    };
+
+    const handleDelete = (record: DataType) => {
+        modal.confirm({
+            title: "Confirm Deletion",
+            content: (
+                <>
+                    <p>Are you sure you want to delete this item?</p>
+                    <p>This action cannot be undone.</p>
+                </>
+            ),
+            onOk: async () => {
+                try {
+                    const resp = await deleteInventory({
+                        payload: { id: record.id },
+                        token: session?.token,
+                    });
+
+                    if (!resp.ok) {
+                        throw new Error();
+                    }
+
+                    messageApi.open({
+                        type: "success",
+                        icon: <CheckCircleFilled className="!text-red-500" />,
+                        content: "Item was deleted successfully!",
+                    });
+                } catch (error) {
+                    messageApi.open({
+                        type: "error",
+                        icon: <CheckCircleFilled className="!text-red-500" />,
+                        content: "Something went wrong!",
+                    });
+                }
+            },
+            okText: "DELETE",
+            okType: "danger",
+        });
+    };
+
     const columns: TableProps<DataType>["columns"] = [
         {
             title: "Photo",
@@ -43,7 +91,7 @@ const Inventory = () => {
                     size={50}
                     shape="square"
                     max={{
-                        count: 2,
+                        count: 1,
                         style: { color: "white", backgroundColor: "#1677ff" },
                     }}
                 >
@@ -131,34 +179,9 @@ const Inventory = () => {
             render: (_, record) => (
                 <CustomActionButtons
                     actions={["view", "edit", "delete"]}
-                    handleView={() => {
-                        view.setVisible(true);
-                        id.setValue(record.id);
-                    }}
-                    handleEdit={() => {
-                        edit.setVisible(true);
-                        id.setValue(record.id);
-                    }}
-                    handleDelete={() => {
-                        modal.confirm({
-                            title: "Confirm Deletion",
-                            content: (
-                                <>
-                                    <p>Are you sure you want to delete this item?</p>
-                                    <p>This action cannot be undone.</p>
-                                </>
-                            ),
-                            onOk: () => {
-                                messageApi.open({
-                                    type: "success",
-                                    icon: <CheckCircleFilled className="!text-red-500" />,
-                                    content: "Item was deleted successfully!",
-                                });
-                            },
-                            okText: "DELETE",
-                            okType: "danger",
-                        });
-                    }}
+                    handleView={handleView.bind(this, record)}
+                    handleEdit={handleEdit.bind(this, record)}
+                    handleDelete={handleDelete.bind(this, record)}
                 />
             ),
         },

@@ -3,6 +3,13 @@ import axiosHelper from "@/util/axiosHelper";
 
 const url = process.env.NEXT_PUBLIC_API_URL;
 
+interface IGetId {
+    payload: {
+        id: number;
+    };
+    token: string | undefined;
+}
+
 interface IGetAllInventoryApi {
     payload?: {
         search?: string;
@@ -11,12 +18,7 @@ interface IGetAllInventoryApi {
     token: string | undefined;
 }
 
-interface IGetInventoryByIdApi {
-    payload: {
-        id: number;
-    };
-    token: string | undefined;
-}
+interface IGetInventoryByIdApi extends IGetId {}
 
 interface ICreateInventoryApi {
     payload: {
@@ -29,6 +31,8 @@ interface ICreateInventoryApi {
     };
     token: string | undefined;
 }
+
+interface IDeleteInventoryApi extends IGetId {}
 
 export const getAllInventory = async ({ payload, token }: IGetAllInventoryApi) => {
     return await axiosHelper({
@@ -54,6 +58,16 @@ export const createInventory = async ({ payload, token }: ICreateInventoryApi) =
     return await axiosHelper({
         url: url,
         pathname: "/inventory/createInventory",
+        method: "POST",
+        payload,
+        token,
+    });
+};
+
+export const deleteInventory = async ({ payload, token }: IDeleteInventoryApi) => {
+    return await axiosHelper({
+        url: url,
+        pathname: "/inventory/deleteInventory",
         method: "POST",
         payload,
         token,

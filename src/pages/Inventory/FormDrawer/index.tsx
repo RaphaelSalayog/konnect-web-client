@@ -268,7 +268,11 @@ const InventoryFormDrawer: React.FC<IInventoryFormDrawer> = ({ reload }) => {
                         name="description"
                         rules={[{ required: true, message: "Description is required" }]}
                     >
-                        <TextArea autoSize={{ minRows: 3, maxRows: 5 }} readOnly={view.visible} />
+                        <TextArea
+                            autoSize={{ minRows: 3, maxRows: 5 }}
+                            allowClear
+                            readOnly={view.visible}
+                        />
                     </Form.Item>
 
                     <Form.Item
@@ -289,6 +293,7 @@ const InventoryFormDrawer: React.FC<IInventoryFormDrawer> = ({ reload }) => {
                                 { value: "meal", label: "Meal" },
                             ]}
                             placeholder="select category"
+                            disabled={view.visible}
                         />
                     </Form.Item>
 
