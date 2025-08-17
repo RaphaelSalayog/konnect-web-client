@@ -7,9 +7,10 @@ const useTable = () => {
     const [search, setSearchState] = useState("");
     const [pagination, setPagination] = useState<TablePaginationConfig>({
         current: 1,
-        pageSize: 10,
-        total: 10,
+        pageSize: 5,
+        total: 0,
     });
+    const [reload, setReload] = useState(true);
 
     const setSearch = (e: string) => {
         if (search !== e) {
@@ -27,6 +28,8 @@ const useTable = () => {
         setSearch,
         pagination,
         setPagination,
+        reload,
+        setReload,
     };
 };
 

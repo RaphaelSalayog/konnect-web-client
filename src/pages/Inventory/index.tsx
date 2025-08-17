@@ -7,9 +7,20 @@ import useTable from "@/hooks/useTable";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
 import { IAttachment } from "@/types/attachment";
 import { CheckCircleFilled, PlusOutlined } from "@ant-design/icons";
-import { Avatar, Button, Input, message, Modal, Table, TableProps, Tag, Tooltip } from "antd";
+import {
+    Avatar,
+    Button,
+    Input,
+    message,
+    Modal,
+    Table,
+    TablePaginationConfig,
+    TableProps,
+    Tag,
+    Tooltip,
+} from "antd";
 import { useSession } from "next-auth/react";
-import { useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import InventoryFormDrawer from "./FormDrawer";
 
 const { Search } = Input;
@@ -30,56 +41,69 @@ const Inventory = () => {
     const [modal, contextHolderModal] = Modal.useModal();
     const [messageApi, contextHolderMessage] = message.useMessage();
     const { add, edit, view, id } = useContext(DrawerContext);
-    const { dataSet, setData, loading, setLoading, search, setSearch, pagination, setPagination } =
-        useTable();
+    const {
+        dataSet,
+        setData,
+        loading,
+        setLoading,
+        search,
+        setSearch,
+        pagination,
+        setPagination,
+        reload,
+        setReload,
+    } = useTable();
 
-    const handleView = (record: DataType) => {
+    const handleView = useCallback((record: DataType) => {
         view.setVisible(true);
         id.setValue(record.id);
-    };
+    }, []);
 
-    const handleEdit = (record: DataType) => {
+    const handleEdit = useCallback((record: DataType) => {
         edit.setVisible(true);
         id.setValue(record.id);
-    };
+    }, []);
 
-    const handleDelete = (record: DataType) => {
-        modal.confirm({
-            title: "Confirm Deletion",
-            content: (
-                <>
-                    <p>Are you sure you want to delete this item?</p>
-                    <p>This action cannot be undone.</p>
-                </>
-            ),
-            onOk: async () => {
-                try {
-                    const resp = await deleteInventory({
-                        payload: { id: record.id },
-                        token: session?.token,
-                    });
+    const handleDelete = useCallback(
+        (record: DataType) => {
+            modal.confirm({
+                title: "Confirm Deletion",
+                content: (
+                    <>
+                        <p>Are you sure you want to delete this item?</p>
+                        <p>This action cannot be undone.</p>
+                    </>
+                ),
+                onOk: async () => {
+                    try {
+                        const resp = await deleteInventory({
+                            payload: { id: record.id },
+                            token: session?.token,
+                        });
 
-                    if (!resp.ok) {
-                        throw new Error();
+                        if (!resp.ok) {
+                            throw new Error();
+                        }
+
+                        messageApi.open({
+                            type: "success",
+                            icon: <CheckCircleFilled />,
+                            content: "Item was deleted successfully!",
+                        });
+                        setReload((prev) => !prev);
+                    } catch (error) {
+                        messageApi.open({
+                            type: "error",
+                            content: "Something went wrong!",
+                        });
                     }
-
-                    messageApi.open({
-                        type: "success",
-                        icon: <CheckCircleFilled className="!text-red-500" />,
-                        content: "Item was deleted successfully!",
-                    });
-                } catch (error) {
-                    messageApi.open({
-                        type: "error",
-                        icon: <CheckCircleFilled className="!text-red-500" />,
-                        content: "Something went wrong!",
-                    });
-                }
-            },
-            okText: "DELETE",
-            okType: "danger",
-        });
-    };
+                },
+                okText: "DELETE",
+                okType: "danger",
+            });
+        },
+        [session?.token]
+    );
 
     const columns: TableProps<DataType>["columns"] = [
         {
@@ -206,25 +230,37 @@ const Inventory = () => {
                     if (resp.ok) {
                         setData(resp.data.lists);
                         setPagination((prev) => ({ ...prev, total: resp.data.total }));
+                    } else {
+                        messageApi.open({
+                            type: "error",
+                            content: "Something went wrong!",
+                        });
                     }
                 }
-            } catch (err) {
+            } catch (error) {
+                messageApi.open({
+                    type: "error",
+                    content: "Something went wrong!",
+                });
             } finally {
                 setLoading(false);
             }
         };
 
         fetch();
-    }, [session?.token, pagination.current, pagination.pageSize, search]);
+    }, [session?.token, pagination.current, pagination.pageSize, search, reload]);
 
-    const handleTableChange: TableProps<DataType>["onChange"] = (pagination) => {
-        setPagination((prev) => ({ ...prev, ...pagination }));
+    const handleTableChange: TableProps<DataType>["onChange"] = useCallback(
+        (pagination: TablePaginationConfig) => {
+            setPagination((prev) => ({ ...prev, ...pagination }));
 
-        // `dataSource` is useless since `pageSize` changed
-        if (pagination.pageSize !== pagination.pageSize) {
-            setData([]);
-        }
-    };
+            // `dataSource` is useless since `pageSize` changed
+            if (pagination.pageSize !== pagination.pageSize) {
+                setData([]);
+            }
+        },
+        []
+    );
 
     return (
         <>
@@ -263,7 +299,11 @@ const Inventory = () => {
                     />
                 </div>
             </TitlePage>
-            <InventoryFormDrawer reload={() => {}} />
+            <InventoryFormDrawer
+                reload={() => {
+                    setReload((prev) => !prev);
+                }}
+            />
         </>
     );
 };

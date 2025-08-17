@@ -1,6 +1,6 @@
 "use client";
 
-import { createInventory, getInventoryById } from "@/app/api/inventory-service";
+import { createInventory, getInventoryById, updateInventory } from "@/app/api/inventory-service";
 import { BUCKET_NAME } from "@/constants/constants";
 import { DrawerContext } from "@/store/context/DrawerVisibilityContext";
 import { IAttachment } from "@/types/attachment";
@@ -67,6 +67,7 @@ const InventoryFormDrawer: React.FC<IInventoryFormDrawer> = ({ reload }) => {
                         name: attachment.file_name,
                         status: "done",
                         url: attachment.presignedUrl,
+                        file_path: attachment.file_path,
                     }));
 
                     form.setFieldsValue({
@@ -100,6 +101,14 @@ const InventoryFormDrawer: React.FC<IInventoryFormDrawer> = ({ reload }) => {
                 if (fileList.length > 0) {
                     const attachments = await Promise.all(
                         fileList.map(async (file) => {
+                            if (!file.originFileObj) {
+                                return {
+                                    id: file.uid,
+                                    file_name: file.name,
+                                    file_path: (file as any).file_path,
+                                } as any;
+                            }
+
                             const { data, error } = await supabase.storage
                                 .from(BUCKET_NAME.inventory)
                                 .upload(customFileName(file), (file as any).originFileObj, {
@@ -132,6 +141,7 @@ const InventoryFormDrawer: React.FC<IInventoryFormDrawer> = ({ reload }) => {
                             type: "success",
                             content: "Item added successfully!",
                         });
+                        reload();
                     } else {
                         messageApi.open({
                             type: "error",
@@ -140,24 +150,31 @@ const InventoryFormDrawer: React.FC<IInventoryFormDrawer> = ({ reload }) => {
                     }
                 }
 
-                // if (edit.visible) {
-                //     const resp = await updateEmployee({
-                //         id: id.value,
-                //         payload: { ...values, attachment: signedUrl ? signedUrl : values.attachment },
-                //     });
-                //     if (resp.status === 200) {
-                //         messageApi.open({
-                //             type: "success",
-                //             content: "Employee update successfully!",
-                //         });
-                //     } else {
-                //         messageApi.open({
-                //             type: "error",
-                //             content: "Failed to update employee!",
-                //         });
-                //     }
-                //     id.setValue("");
-                // }
+                if (edit.visible) {
+                    const resp = await updateInventory({
+                        payload: {
+                            ...values,
+                            id: id.value,
+                            attachments: uploadedAttachments,
+                        },
+                        token: session?.token,
+                    });
+
+                    if (resp.status === 200) {
+                        messageApi.open({
+                            type: "success",
+                            content: "Item update successfully!",
+                        });
+                        reload();
+                    } else {
+                        messageApi.open({
+                            type: "error",
+                            content: "Failed to update item!",
+                        });
+                    }
+
+                    id.setValue(null);
+                }
                 // reload();
             } catch (error) {
                 messageApi.open({
@@ -200,13 +217,13 @@ const InventoryFormDrawer: React.FC<IInventoryFormDrawer> = ({ reload }) => {
         }
     }, [form, modal, onClose]);
 
-    const normFile = (e: any) => {
+    const normFile = useCallback((e: any) => {
         console.log("Upload event:", e);
         if (Array.isArray(e)) {
             return e;
         }
         return e?.fileList;
-    };
+    }, []);
 
     return (
         <>
