@@ -6,8 +6,8 @@ declare module "next-auth" {
         user: {
             id: string;
             username: string;
-            firstName: string;
-            lastName: string;
+            first_name: string;
+            last_name: string;
             // Add other user fields here...
         } & DefaultSession["user"];
         token: string; // JWT from backend
@@ -24,8 +24,8 @@ declare module "next-auth/jwt" {
             user: {
                 id: string;
                 username: string;
-                firstName: string;
-                lastName: string;
+                first_name: string;
+                last_name: string;
                 // Add other user fields here...
             };
             token: string;

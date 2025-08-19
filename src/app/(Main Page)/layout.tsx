@@ -3,7 +3,7 @@
 import { routes } from "@/constants/routes";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -28,6 +28,7 @@ export default function RootLayout({
 }>) {
     const router = useRouter();
     const pathname = usePathname();
+    const { data: session } = useSession();
     const [collapsed, setCollapsed] = useState(false);
     const {
         token: { colorBgContainer, borderRadiusLG },
@@ -94,7 +95,7 @@ export default function RootLayout({
                         }}
                     />
                     <div className="!px-6">
-                        <p>salayog@gmail.com</p>
+                        <p>{`${session?.user.first_name} ${session?.user.last_name}`}</p>
                     </div>
                 </Header>
                 <Content
